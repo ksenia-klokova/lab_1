@@ -140,10 +140,9 @@ public:
             {
                 try 
                 {
-                    //database::Person result = database::Person::read_from_cache_by_login(login);
-                    //std::cout << "item from cache:" << login << std::endl;
-                    //Poco::JSON::Stringifier::stringify(result.toJSON(), ostr);
+                    database::Person result = database::Person::read_from_cache_by_login(login);
                     std::cout << "item from cache:" << login << std::endl;
+                    Poco::JSON::Stringifier::stringify(result.toJSON(), ostr);
                     return;
                 }
                 catch (...)
@@ -158,8 +157,8 @@ public:
                 if (!no_cache) 
                 {
                     result.save_to_cache();
-                    std::cout << "saved to cache:" << login << std::endl;
-                    std::cout << "cache size:" << database::Person::size_of_cache() << std::endl;
+                    //std::cout << "saved to cache:" << login << std::endl;
+                    //std::cout << "cache size:" << database::Person::size_of_cache() << std::endl;
                 }
                 Poco::JSON::Stringifier::stringify(result.toJSON(), ostr);
                 return;

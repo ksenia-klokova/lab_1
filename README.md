@@ -1,6 +1,6 @@
 База данных создается, индексируется и заполняется при запуске ./start.sh
 
-# Приверы вывода для запросов
+# Примеры вывода для запросов
 
 ### GET
 
@@ -13,10 +13,14 @@ http://192.168.243.128/person?login=Carmella_Hamilton1725@sheye.org
 ```
 ```
 cache missed for login:Carmella_Hamilton1725@sheye.org
+saved to cache:Carmella_Hamilton1725@sheye.org
+cache size:1
 ```
 
 Второй запрос (с кэшем):
-
+```
+item from cache:Carmella_Hamilton1725@sheye.org
+```
 
 http://192.168.243.128/person?
 ```
@@ -34,6 +38,8 @@ http://192.168.243.128/person?add&first_name=Paul&last_name=Dano&age=37&login=pa
 
 ```
 inserted:pauldano@hollywood.com
+saved to cache:pauldano@hollywood.com
+cache size:2
 ```
 
 ```

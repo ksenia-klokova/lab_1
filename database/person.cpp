@@ -23,10 +23,8 @@ namespace database
 
     void Person::init()
     {   
-        /*
         try
         {
-
             Poco::Data::Session session = database::Database::get().create_session();
             //
             Statement drop_stmt(session);
@@ -99,13 +97,14 @@ namespace database
 
             std::cout << "statement:" << e.what() << std::endl;
             throw; 
-        } */
+        }
     }
 
     Poco::JSON::Object::Ptr Person::toJSON() const
     {
         Poco::JSON::Object::Ptr root = new Poco::JSON::Object();
 
+        root->set("id", _id);
         root->set("login", _login);
         root->set("first_name", _first_name);
         root->set("last_name", _last_name);
@@ -171,7 +170,7 @@ namespace database
             std::string result;
             if (database::Cache::get().get(login, result))
             {
-                std::cout << "result:" << result << std::endl;
+                //std::cout << "result:" << result << std::endl;
                 return fromJSON(result);
             }
             else
@@ -207,6 +206,8 @@ namespace database
         Poco::JSON::Stringifier::stringify(toJSON(), ss);
         std::string message = ss.str();
         database::Cache::get().put(_login, message);
+        std::cout << "saved to cache:" << _login << std::endl;
+        std::cout << "cache size:" << database::Person::size_of_cache() << std::endl;
     }
 
     std::vector<Person> Person::read_all()
