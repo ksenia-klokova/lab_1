@@ -4,11 +4,19 @@
 
 ### GET
 
+Первый запрос:
+
 http://192.168.243.128/person?login=Carmella_Hamilton1725@sheye.org
 
 ```
 {"age":13,"first_name":"Carmella","last_name":"Hamilton","login":"Carmella_Hamilton1725@sheye.org"}
 ```
+```
+cache missed for login:Carmella_Hamilton1725@sheye.org
+```
+
+Второй запрос (с кэшем):
+
 
 http://192.168.243.128/person?
 ```

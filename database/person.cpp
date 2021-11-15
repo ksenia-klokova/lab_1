@@ -1,5 +1,6 @@
 #include "person.h"
 #include "database.h"
+#include "cache.h"
 #include "../config/config.h"
 
 #include <Poco/Data/MySQL/Connector.h>
@@ -21,15 +22,16 @@ namespace database
 {
 
     void Person::init()
-    {
+    {   
+        /*
         try
         {
 
             Poco::Data::Session session = database::Database::get().create_session();
-            //*
+            //
             Statement drop_stmt(session);
             drop_stmt << "DROP TABLE IF EXISTS Person", now;
-            //*/
+            //
 
             // (re)create table
             Statement create_stmt(session);
@@ -84,7 +86,8 @@ namespace database
         fn_ln_idx << "CREATE INDEX fn_ln USING BTREE ON Person(first_name,last_name);", now;
 
         std::cout << "table indexed" << std::endl;
-        }
+        } 
+        
 
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
@@ -95,8 +98,8 @@ namespace database
         {
 
             std::cout << "statement:" << e.what() << std::endl;
-            throw;
-        }
+            throw; 
+        } */
     }
 
     Poco::JSON::Object::Ptr Person::toJSON() const
@@ -161,6 +164,87 @@ namespace database
         }
     }
 
+    Person Person::read_from_cache_by_login(std::string login)
+    {
+        try
+        {
+            std::string result;
+            if (database::Cache::get().get(login, result))
+            {
+                std::cout << "result:" << result << std::endl;
+                return fromJSON(result);
+            }
+            else
+                throw std::logic_error("key not found in the cache");
+        }
+        catch (std::exception& err)
+        {
+            std::cout << "error:" << err.what() << std::endl;
+            throw;
+        }
+    }
+
+    void Person::warm_up_cache()
+    {
+        std::cout << "wharming up people cache ...";
+        auto array = read_all();
+        long count = 0;
+        for (auto &a : array)
+        {
+            a.save_to_cache();
+            ++count;
+        }
+        std::cout << "done: " << count << std::endl;
+    }
+
+    size_t Person::size_of_cache(){
+        return database::Cache::get().size();
+    }
+
+    void Person::save_to_cache()
+    {
+        std::stringstream ss;
+        Poco::JSON::Stringifier::stringify(toJSON(), ss);
+        std::string message = ss.str();
+        database::Cache::get().put(_login, message);
+    }
+
+    std::vector<Person> Person::read_all()
+    {
+        try
+        {
+            Poco::Data::Session session = database::Database::get().create_session();
+            Statement select(session);
+            std::vector<Person> result;
+            Person p;
+            select << "SELECT login, first_name, last_name, age FROM Person",
+                into(p._login),
+                into(p._first_name),
+                into(p._last_name),
+                into(p._age),
+                range(0, 1); //  iterate over result set one row at a time
+
+            while (!select.done())
+            {
+                select.execute();
+                result.push_back(p);
+            }
+            return result;
+        }
+
+        catch (Poco::Data::MySQL::ConnectionException &e)
+        {
+            std::cout << "connection:" << e.what() << std::endl;
+            throw;
+        }
+        catch (Poco::Data::MySQL::StatementException &e)
+        {
+
+            std::cout << "statement:" << e.what() << std::endl;
+            throw;
+        }
+    }
+
     std::vector<Person> Person::search(std::string first_name, std::string last_name)
     {
         try
@@ -200,7 +284,6 @@ namespace database
             throw;
         }
     }
-
    
     void Person::save_to_mysql()
     {
