@@ -15,6 +15,7 @@ if(NOT ${Poco_FOUND})
     message(FATAL_ERROR "Poco C++ Libraries not found.")
 endif()
 
+include_directories(SYSTEM ${IGNITE_INCLUDE_DIR} ${JNI_INCLUDE_DIRS})
 include_directories(${Poco_INCLUDE_DIRS})
 include_directories(${GTEST_INCLUDE_DIRS})
 include_directories("/usr/include/mysql")
