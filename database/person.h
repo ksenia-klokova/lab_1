@@ -35,6 +35,7 @@ namespace database
             static Person read_by_login(std::string login);
             static std::vector<Person> search(std::string first_name,std::string last_name);
             void save_to_mysql();
+            void send_to_queue();
 
             Poco::JSON::Object::Ptr toJSON() const;
 

@@ -39,7 +39,7 @@ using Poco::Util::ServerApplication;
 
 #include "http_request_factory.h"
 #include "../config/config.h"
-
+#include "../database/person.h"
 
 
 class HTTPWebServer : public Poco::Util::ServerApplication
@@ -73,11 +73,17 @@ protected:
                 .repeatable(false)
                 .callback(OptionCallback<HTTPWebServer>(this, &HTTPWebServer::handleHelp)));
         options.addOption(
-            Option("host", "h", "set ip address for dtabase")
+            Option("read", "r", "set ip address for read requests")
                 .required(false)
                 .repeatable(false)
                 .argument("value")
-                .callback(OptionCallback<HTTPWebServer>(this, &HTTPWebServer::handleHost)));
+                .callback(OptionCallback<HTTPWebServer>(this, &HTTPWebServer::handleReadIP)));
+        options.addOption(
+            Option("write", "w", "set ip address for write requests")
+                .required(false)
+                .repeatable(false)
+                .argument("value")
+                .callback(OptionCallback<HTTPWebServer>(this, &HTTPWebServer::handleWriteIP)));
         options.addOption(
             Option("port", "po", "set mysql port")
                 .required(false)
@@ -107,7 +113,18 @@ protected:
                 .required(false)
                 .repeatable(false)
                 .callback(OptionCallback<HTTPWebServer>(this, &HTTPWebServer::handleInitDB)));
-        
+        options.addOption(
+            Option("queue", "q", "set queue host")
+                .required(false)
+                .repeatable(false)
+                .argument("value")
+                .callback(OptionCallback<HTTPWebServer>(this, &HTTPWebServer::handleQueueHost)));
+        options.addOption(
+            Option("topic", "t", "set queue topic")
+                .required(false)
+                .repeatable(false)
+                .argument("value")
+                .callback(OptionCallback<HTTPWebServer>(this, &HTTPWebServer::handleQueueTopic)));
     }
 
     void handleInitDB([[maybe_unused]] const std::string &name,
@@ -142,14 +159,33 @@ protected:
         Config::get().port() = value;
     }
 
-    void handleHost([[maybe_unused]] const std::string &name,
+    void handleReadIP([[maybe_unused]] const std::string &name,
                       [[maybe_unused]] const std::string &value)
     {
-        std::cout << "host:" << value << std::endl;
-        Config::get().host() = value;
+        std::cout << "read_ip:" << value << std::endl;
+        Config::get().read_request_ip() = value;
     }
 
+    void handleWriteIP([[maybe_unused]] const std::string &name,
+                       [[maybe_unused]] const std::string &value)
+    {
+        std::cout << "write_ip:" << value << std::endl;
+        Config::get().write_request_ip() = value;
+    }
 
+    void handleQueueHost([[maybe_unused]] const std::string &name,
+                       [[maybe_unused]] const std::string &value)
+    {
+        std::cout << "queue host:" << value << std::endl;
+        Config::get().queue_host() = value;
+    }
+
+    void handleQueueTopic([[maybe_unused]] const std::string &name,
+                       [[maybe_unused]] const std::string &value)
+    {
+        std::cout << "queue topic:" << value << std::endl;
+        Config::get().queue_topic() = value;
+    }
 
     void handleHelp([[maybe_unused]] const std::string &name,
                     [[maybe_unused]] const std::string &value)

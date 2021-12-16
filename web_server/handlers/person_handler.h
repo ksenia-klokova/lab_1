@@ -220,7 +220,8 @@ public:
                                     }
                                     catch (...)
                                     {
-                                        person.save_to_mysql();
+                                        //person.save_to_mysql();
+                                        person.send_to_queue();
                                         ostr << "{ \"result\": true }";
                                         return;
                                     }
