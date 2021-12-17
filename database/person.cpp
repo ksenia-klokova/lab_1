@@ -27,7 +27,6 @@ namespace database
         {
 
             Poco::Data::Session session = database::Database::get().create_session_write();
-            /*
             //
             Statement drop_stmt(session);
             drop_stmt << "DROP TABLE IF EXISTS Person", now;
@@ -44,6 +43,7 @@ namespace database
                 now;
             std::cout << "table created" << std::endl;
 
+            /*
             // populate table
             std::ifstream file("/home/stud/hl_mai_lab_01/person_data.json");
             std::stringstream tmp;
@@ -213,8 +213,10 @@ namespace database
         std::stringstream ss;
         Poco::JSON::Stringifier::stringify(toJSON(), ss);
         std::string message = ss.str();
+        //std::cout << "message:" << message << std::endl;
+        //std::cout << "Config::get().get_queue_topic()" << Config::get().get_queue_topic() << std::endl;
         producer.produce(cppkafka::MessageBuilder(Config::get().get_queue_topic()).partition(0).payload(message));
-        producer.flush();
+        producer.flush(); 
     }
    
     void Person::save_to_mysql()
